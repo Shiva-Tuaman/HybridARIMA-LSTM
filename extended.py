@@ -127,7 +127,7 @@ def load_and_preprocess_data(df, months):
         if 'date' not in df.columns or 'price' not in df.columns:
             raise ValueError(f"CSV must have 'date' and 'price' columns. Found columns: {list(df.columns)}")
     
-    df['date'] = pd.to_datetime(df['date'], dayfirst=True)
+    df['date'] = pd.to_datetime(df['date'], format='%d-%m-%Y')
     df['price'] = pd.to_numeric(df['price'], errors='coerce')
     
     # Remove any rows with missing values
@@ -243,9 +243,6 @@ def forecast_lstm(model, scaler, recent_data, lookback, steps):
 
 def add_volatility_component(return_forecasts, historical_returns, confidence_level=0.8):
     """Add realistic volatility to forecasts using historical volatility patterns"""
-    # Ensure return_forecasts is a numpy array
-    return_forecasts = np.array(return_forecasts)
-    
     # Calculate historical volatility metrics
     historical_std = np.std(historical_returns)
     historical_skew = pd.Series(historical_returns).skew()
@@ -270,9 +267,9 @@ def add_volatility_component(return_forecasts, historical_returns, confidence_le
         # Occasionally add extreme movements (shocks)
         if np.random.random() < extreme_prob * time_factor:
             shock = np.random.choice([-1, 1]) * extreme_threshold * np.random.uniform(0.5, 1.0)
-            adjusted_forecasts[i] += shock
+            adjusted_forecasts.iloc[i] += shock
         else:
-            adjusted_forecasts[i] += noise
+            adjusted_forecasts.iloc[i] += noise
     
     return adjusted_forecasts
 
