@@ -670,17 +670,21 @@ if st.session_state.model_trained:
     export_df = pd.DataFrame({
         'Date': forecast_dates_30,
         'Predicted_Price': prices_30,
-        'Lower_Bound_95':
-    }]
+        'Lower_Bound_95': lower_30,
+        'Upper_Bound_95': upper_30,
+        'Days_Ahead': list(range(1, 31))
+    })
+
+    # Convert to CSV
     csv = export_df.to_csv(index=False)
 
-st.download_button(
-    label="📥 Download Forecast CSV",
-    data=csv,
-    file_name=f"copper_forecast_{datetime.now().strftime('%Y%m%d')}.csv",
-    mime="text/csv",
-    use_container_width=True
-)
+    st.download_button(
+        label="📥 Download Forecast CSV",
+        data=csv,
+        file_name=f"copper_forecast_{datetime.now().strftime('%Y%m%d')}.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
 
-with st.expander("View Forecast Table"):
-    st.dataframe(export_df, use_container_width=True)
+    with st.expander("View Forecast Table"):
+        st.dataframe(export_df, use_container_width=True)
